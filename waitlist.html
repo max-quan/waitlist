@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palo Alto — Your table is waiting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0F2620;
+    --bg-card: #14291F;
+    --bg-field: #1B3229;
+    --brass: #C9A15C;
+    --brass-bright: #E2C384;
+    --ivory: #F5EFE3;
+    --sage: #93AA9C;
+    --sage-dim: #6E8478;
+    --success: #8FB89A;
+    --error: #D98E7B;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg-deep);
+  }
+
+  body {
+    font-family: 'Work Sans', sans-serif;
+    color: var(--ivory);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+    padding: 24px;
+  }
+
+  .glow {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: 900px;
+    height: 900px;
+    transform: translate(-50%, -55%);
+    background: radial-gradient(circle, rgba(201,161,92,0.13) 0%, rgba(201,161,92,0) 65%);
+    pointer-events: none;
+    animation: breathe 9s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.7; transform: translate(-50%, -55%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -55%) scale(1.08); }
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-card);
+    border: 1px solid rgba(201,161,92,0.35);
+    border-radius: 3px;
+    padding: 52px 44px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin: 0 0 22px;
+  }
+
+  .rule {
+    width: 36px;
+    height: 1px;
+    background: var(--brass);
+    opacity: 0.6;
+    margin: 0 auto 22px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(28px, 5.6vw, 42px);
+    line-height: 1.12;
+    margin: 0 0 16px;
+    color: var(--ivory);
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--sage);
+    max-width: 34ch;
+    margin: 0 auto 34px;
+  }
+
+  .sub strong {
+    color: var(--brass-bright);
+    font-weight: 600;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  input[type="email"] {
+    width: 100%;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+    color: var(--ivory);
+    background: var(--bg-field);
+    border: 1px solid rgba(201,161,92,0.3);
+    border-radius: 2px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  input[type="email"]::placeholder { color: var(--sage-dim); }
+
+  input[type="email"]:focus-visible {
+    border-color: var(--brass-bright);
+    box-shadow: 0 0 0 3px rgba(201,161,92,0.18);
+  }
+
+  button {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--bg-deep);
+    background: var(--brass);
+    border: none;
+    border-radius: 2px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  button:hover:not(:disabled) { background: var(--brass-bright); }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: 0.6; cursor: default; }
+
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--brass-bright);
+    outline-offset: 2px;
+  }
+
+  .micro {
+    font-size: 12.5px;
+    color: var(--sage-dim);
+    margin-top: 16px;
+  }
+
+  .count {
+    font-size: 12.5px;
+    color: var(--sage);
+    margin-top: 22px;
+    min-height: 16px;
+  }
+
+  .count strong { color: var(--brass-bright); font-weight: 600; }
+
+  .error-msg {
+    font-size: 13px;
+    color: var(--error);
+    min-height: 16px;
+    margin: -2px 0 2px;
+  }
+
+  /* success state */
+  .success-view { display: none; }
+  .success-view.active { display: block; }
+  .form-view.hidden { display: none; }
+
+  .seal {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 22px;
+    border: 1px solid var(--brass);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .seal svg { width: 20px; height: 20px; }
+
+  .reservation-no {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--brass-bright);
+    letter-spacing: 0.04em;
+    margin: 18px 0 0;
+  }
+
+  .admin-view { display: none; text-align: left; }
+  .admin-view.active { display: block; }
+  .admin-view h1 { text-align: center; font-size: clamp(24px, 5vw, 32px); }
+  .admin-count { text-align: center; color: var(--sage); font-size: 13px; margin: 0 0 20px; }
+
+  #emailDump {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    font-family: 'Work Sans', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ivory);
+    background: var(--bg-field);
+    border: 1px solid rgba(201,161,92,0.3);
+    border-radius: 2px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .admin-actions { display: flex; gap: 10px; }
+  .admin-actions button {
+    flex: 1;
+    background: transparent;
+    color: var(--brass);
+    border: 1px solid var(--brass);
+  }
+  .admin-actions button:hover:not(:disabled) { background: rgba(201,161,92,0.12); }
+  .admin-status { text-align: center; font-size: 12px; color: var(--sage-dim); margin-top: 12px; min-height: 14px; }
+
+  @media (max-width: 480px) {
+    .card { padding: 40px 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow { animation: none; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="glow" aria-hidden="true"></div>
+
+  <main class="card">
+
+    <div class="form-view" id="formView">
+      <p class="eyebrow">Palo Alto</p>
+      <div class="rule"></div>
+      <h1>Your table<br>is waiting.</h1>
+      <p class="sub">Exclusive access to the best deals at your favorite Palo Alto restaurants for just <strong>$9/month</strong>.</p>
+
+      <form id="waitlistForm" novalidate>
+        <input
+          type="email"
+          id="emailInput"
+          placeholder="you@stanford.edu"
+          autocomplete="email"
+          required
+          aria-label="Email address"
+        >
+        <div class="error-msg" id="errorMsg" role="alert"></div>
+        <button type="submit" id="submitBtn">Reserve My Spot</button>
+      </form>
+
+      <p class="micro">No spam. Just first access when we open.</p>
+      <p class="count" id="countText" aria-live="polite"></p>
+    </div>
+
+    <div class="success-view" id="successView">
+      <div class="seal" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 12.5L9.5 18L20 6" stroke="#C9A15C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="eyebrow">Thank You</p>
+      <div class="rule"></div>
+      <h1>You're on<br>the list.</h1>
+      <p class="sub">Thanks for signing up — we'll email you before the doors open.</p>
+      <p class="reservation-no" id="reservationNo"></p>
+    </div>
+
+    <div class="admin-view" id="adminView">
+      <p class="eyebrow">Waitlist</p>
+      <div class="rule"></div>
+      <h1>Collected Emails</h1>
+      <p class="admin-count" id="adminCount">Loading…</p>
+      <textarea id="emailDump" readonly aria-label="Collected emails"></textarea>
+      <div class="admin-actions">
+        <button type="button" id="copyBtn">Copy All</button>
+        <button type="button" id="downloadBtn">Download CSV</button>
+        <button type="button" id="refreshBtn">Refresh</button>
+      </div>
+      <p class="admin-status" id="adminStatus"></p>
+    </div>
+
+  </main>
+
+<script>
+  const PREFIX = 'waitlist:';
+  const formView = document.getElementById('formView');
+  const successView = document.getElementById('successView');
+  const form = document.getElementById('waitlistForm');
+  const emailInput = document.getElementById('emailInput');
+  const errorMsg = document.getElementById('errorMsg');
+  const submitBtn = document.getElementById('submitBtn');
+  const countText = document.getElementById('countText');
+  const reservationNo = document.getElementById('reservationNo');
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  async function loadCount() {
+    try {
+      const result = await window.storage.list(PREFIX, true);
+      const n = result && result.keys ? result.keys.length : 0;
+      if (n > 0) {
+        countText.innerHTML = `Join <strong>${n}</strong> Palo Alto local${n === 1 ? '' : 's'} already on the list`;
+      } else {
+        countText.textContent = 'Be one of the first to join.';
+      }
+    } catch (e) {
+      countText.textContent = '';
+    }
+  }
+
+  // --- Admin mode: append ?admin=1 to the URL to view/export collected emails ---
+  const adminView = document.getElementById('adminView');
+  const emailDump = document.getElementById('emailDump');
+  const adminCount = document.getElementById('adminCount');
+  const adminStatus = document.getElementById('adminStatus');
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+
+  async function loadAdminEmails() {
+    adminStatus.textContent = '';
+    try {
+      const result = await window.storage.list(PREFIX, true);
+      const keys = (result && result.keys) ? result.keys : [];
+      const emails = keys.map(k => k.slice(PREFIX.length)).sort();
+      adminCount.textContent = `${emails.length} email${emails.length === 1 ? '' : 's'} collected`;
+      emailDump.value = emails.join('\n');
+    } catch (e) {
+      adminCount.textContent = 'Could not load emails.';
+      emailDump.value = '';
+    }
+  }
+
+  if (isAdmin) {
+    formView.classList.add('hidden');
+    adminView.classList.add('active');
+    loadAdminEmails();
+
+    document.getElementById('refreshBtn').addEventListener('click', loadAdminEmails);
+
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(emailDump.value);
+        adminStatus.textContent = 'Copied to clipboard.';
+      } catch (e) {
+        emailDump.select();
+        adminStatus.textContent = 'Could not auto-copy — text is selected, press Cmd/Ctrl+C.';
+      }
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const rows = emailDump.value.split('\n').filter(Boolean);
+      const csv = 'email\n' + rows.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'waitlist-emails.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      adminStatus.textContent = 'CSV downloaded.';
+    });
+  }
+
+  loadCount();
+
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('storage timeout')), ms))
+    ]);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    errorMsg.textContent = '';
+    const email = emailInput.value.trim();
+
+    if (!isValidEmail(email)) {
+      errorMsg.textContent = 'Enter a valid email to reserve your spot.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Reserving…';
+
+    // Show the success screen immediately — don't let storage block the UI.
+    reservationNo.textContent = 'Reservation confirmed';
+    formView.classList.add('hidden');
+    successView.classList.add('active');
+
+    // Save the email in the background. If storage isn't available or fails,
+    // the user still sees success — this only affects whether it's recorded.
+    const key = PREFIX + email.toLowerCase();
+    (async () => {
+      try {
+        if (typeof window.storage === 'undefined') {
+          console.warn('window.storage not available in this context — email not persisted.');
+          return;
+        }
+        const listResult = await withTimeout(window.storage.list(PREFIX, true), 4000);
+        const existingKeys = (listResult && listResult.keys) ? listResult.keys : [];
+        const alreadyIn = existingKeys.includes(key);
+        const position = alreadyIn ? existingKeys.length : existingKeys.length + 1;
+        if (!alreadyIn) {
+          await withTimeout(window.storage.set(key, JSON.stringify({ email, joinedAt: Date.now() }), true), 4000);
+        }
+        reservationNo.textContent = `Reservation No. ${String(position).padStart(3, '0')}`;
+      } catch (err) {
+        console.error('Waitlist storage issue (UI already shows success):', err);
+      }
+    })();
+  });
+</script>
+
+</body>
+</html>
